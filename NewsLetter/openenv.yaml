@@ -1,0 +1,16 @@
+spec_version: 1
+name: project
+type: space
+runtime: fastapi
+app: server.app:app
+port: 8000
+tasks:
+  - id: "reliability_check"
+    difficulty: "easy"
+    score_threshold: 0.6
+  - id: "interest_matching"
+    difficulty: "medium"
+    score_threshold: 0.8
+  - id: "curation_pro"
+    difficulty: "hard"
+    score_threshold: 0.95

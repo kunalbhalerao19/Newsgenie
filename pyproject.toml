@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "openenv-project"
+version = "0.1.0"
+description = "Project environment for OpenEnv"
+requires-python = ">=3.10"
+dependencies = [
+    "openenv @ git+https://github.com/meta-pytorch/OpenEnv.git",
+]
+
+[project.optional-dependencies]
+core = ["openenv-core[core]>=0.2.2"]
+
+[project.scripts]
+server = "env.server.app:main"
+
+[tool.setuptools]
+include-package-data = true
+packages = ["env", "env.server"]
+package-dir = { "env" = "." }

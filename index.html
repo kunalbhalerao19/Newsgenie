@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Newsletter Generator</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      background: #f8fafc;
+    }
+    .container {
+      background: white;
+      border-radius: 1.5rem;
+      padding: 2rem;
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+    }
+    h1 {
+      margin-top: 0;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    button {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 500;
+      border-radius: 2rem;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+    button:hover {
+      background: #2563eb;
+    }
+    button:active {
+      transform: scale(0.98);
+    }
+    button:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+    }
+    #status {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: #475569;
+    }
+    #output {
+      white-space: pre-wrap;
+      background: #f1f5f9;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+      border-radius: 1rem;
+      font-family: ui-monospace, monospace;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      border-left: 4px solid #3b82f6;
+    }
+    .error {
+      border-left-color: #ef4444;
+      color: #b91c1c;
+    }
+    hr {
+      margin: 1rem 0;
+      border: none;
+      border-top: 1px solid #e2e8f0;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>📰 AI Newsletter Generator</h1>
+  <p>Click the button to fetch the latest tech & AI news and generate a smart newsletter using Groq.</p>
+  <button id="generateBtn" onclick="generateNewsletter()">✨ Generate Newsletter</button>
+  <div id="status"></div>
+  <div id="output" style="display: none;"></div>
+</div>
+
+<script>
+  async function generateNewsletter() {
+    const btn = document.getElementById('generateBtn');
+    const statusDiv = document.getElementById('status');
+    const outputDiv = document.getElementById('output');
+
+    // Disable button and show loading
+    btn.disabled = true;
+    btn.textContent = '⏳ Generating...';
+    statusDiv.textContent = 'Fetching articles and generating newsletter...';
+    outputDiv.style.display = 'block';
+    outputDiv.textContent = '';
+    outputDiv.classList.remove('error');
+
+    try {
+      // Call your local API (running on port 8000)
+      const response = await fetch('http://localhost:8000/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          interests: ['Artificial Intelligence', 'Technology', 'Startups', 'Programming'],
+          max_articles: 5
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || `HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+      outputDiv.textContent = data.newsletter;
+      statusDiv.textContent = `✅ Newsletter generated using ${data.articles_used} articles.`;
+      outputDiv.classList.remove('error');
+    } catch (error) {
+      console.error('Error:', error);
+      outputDiv.textContent = `❌ Failed to generate newsletter:\n\n${error.message}\n\nMake sure your API server is running on http://localhost:8000`;
+      outputDiv.classList.add('error');
+      statusDiv.textContent = '⚠️ Request failed';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '✨ Generate Newsletter';
+    }
+  }
+</script>
+</body>
+</html>
